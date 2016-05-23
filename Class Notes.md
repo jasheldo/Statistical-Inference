@@ -1,7 +1,12 @@
-# Statistical Inference
-## Course notes by James Sheldon
+Statistical Inference
+=====================
 
-## Week 1
+Course notes by James Sheldon
+-----------------------------
 
-### Module 3: Probability Mass Function
+Week 2
+------
 
+### Module 5: Variability
+
+ 
