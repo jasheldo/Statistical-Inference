@@ -1,0 +1,77 @@
+---
+title: "Tooth Growth Analysis"
+author: "James Sheldon"
+date: "May 23, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(datasets)
+library(graphics)
+```
+```{r system}
+sessionInfo()
+```
+
+## Overview
+
+This analysis pertains to the ToothGrowth dataset made available in the R platform.  We will load the data, summarize what we are seeing, perform some exploratory analysis and use confidence intervals and hypothesis tests to determine any relationships between tooth growth and the other variables.
+
+```{r teeth}
+data("ToothGrowth")
+summary(ToothGrowth)
+str(ToothGrowth)
+head(ToothGrowth)
+tail(ToothGrowth)
+unique(ToothGrowth$dose)
+unique(ToothGrowth$supp)
+by(ToothGrowth$len, INDICES = list(ToothGrowth$supp, ToothGrowth$dose), summary)
+```
+
+What we're seeing is this data represents the delivery of three different levels of Vitamin C (0.5, 1, and 2 mg) via two different vectors:  orange juice or ascorbic acid.  There are 60 total observations with three variables:
+
+1. `len` which is a numeric value that represents the tooth length.
+2. `supp` is the delivery vector.
+3. `dose` is the numeric measure of the dose size in milligrams.
+
+## Exploratory Analysis
+
+You can also embed plots, for example:
+
+```{r tooth supp and dose, echo=FALSE}
+# Calculate len mean for every dose and supp
+avg <- aggregate(len~.,data=ToothGrowth,mean)
+#Plot the Tooth Lenght (len) relative to Dosage(dose) & Supplement (supp)
+g <- ggplot(data = ToothGrowth,aes(x=dose,y=len))
+g <- g + geom_point(aes(group=supp,colour=supp,size=2,alpha=0.6))
+g <- g + geom_line(data=avg,aes(group=supp,colour=supp))
+g <- g + labs(title="Fig 1: Tooth Lenght (len) relative to Dosage(dose) & Supplement (supp)")
+print(g)
+```
+
+```{r tooth and supp}
+# Analyze the Tooth Lenght (len) relationship to Supplement(supp) independent of dose
+g <- ggplot(aes(x = supp, y = len), data = ToothGrowth) + 
+    geom_boxplot(aes(fill = supp))
+g <- g + labs(title="Fig 2: Tooth Lenght (len) relationship to Supplement(supp)")
+print(g)
+```
+
+```{r tooth and dose}
+# Analyze the Tooth Lenght (len) relationship to Dose (does) independent of Supplement
+g <- ggplot(aes(x = factor(dose), y = len), data = ToothGrowth) + 
+    geom_boxplot(aes(fill = factor(dose)))
+g <- g + labs(title="Fig 3: Tooth Lenght (len) relationship to Dosage(dose)")
+print(g)
+```
+
+```{r}
+# Determine if within a Dosage - supplements have different effects on tooth growth
+g <- ggplot(aes(x = supp, y = len), data = ToothGrowth) +
+    geom_boxplot(aes(fill = supp)) + facet_wrap(~ dose)
+g <- g + labs(title="Fig 4: Tooth Lenght (len) by Supplement(supp) & Dosage(dose)")
+print(g)
+```
+

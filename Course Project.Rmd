@@ -2,11 +2,12 @@
 title: "The Exponential Distribution in R and the Central Limit Theorem"
 author: "James Sheldon"
 date: "May 23, 2016"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
 ```
 ```{r system}
 sessionInfo()
@@ -17,6 +18,8 @@ This is part 1 of the final course project for the statistical inference class f
 
 ## Simulation
 
+Let's begin by generating and plotting 10,000 observations based on the exponential distribution.
+
 ```{r}
 set.seed(10736)
 lambda <- 0.2 # fixed rate parameter
@@ -24,41 +27,48 @@ n <- 40 # number of exponentials
 sim <- 1000 # fixed number of simulations per instruction
 
 # the exponential distribution
-plot(rexp(10000,lambda), pch=20, cex=0.6, main="The Exponential Distribution for 10,000 Observations")
+qplot(x = c (1:10000), y = rexp(10000,lambda), geom = "point", main = "The Exponential Distribution for 10,000 Observations", xlab = "x", ylab = "y")
 ```
+
+That's fun.  Now, how is this data distributed?  Based on the assignment notes on the submission page, let's plot 1,000 averages of these randomly generated observations.
 
 ```{r}
 # generate the collection of means for 1,000 simulations of the exponential distribution
-means <- NULL
-for (i in 1 : sim) means <- c(means, mean(rexp(n,lambda)))
-hist(means, col="blue", main="rexp Mean Mistribution", breaks=40)
-rug(means)
+mns <- NULL
+for (i in 1 : sim) mns <- c(mns, mean(rexp(n, lambda)))
+qplot(mns, geom = "histogram", bins = 40, fill = ..count.., ylab = "Frequency", main = "Mean Distribution of rexp()")
 ```
+We can see the normal distribution of these means taking shape.  And based on the color density it looks like the central tendency is at or near a mean of 5.  We'll explore that further next.
+
 
 ## Sample Mean Versus Theoretical Mean
 
-Since the theoretical mean of the exponential distribution is 1/lambda and in our examples we are using lambda = 0.2, the sample and theoretical mean should both be at or near 5.
+Since the theoretical mean of the exponential distribution is 1/lambda and in our examples we are using lambda = 0.2, the sample and theoretical mean should both be at or near 5.  Let's see what happens.
 
 ```{r}
-hist(means, col="blue", main="Actual vs Theoretical Mean", breaks=20)
-abline(v=mean(means), lwd="3", col="red")
-text(6.1, 90, paste("Actual Mean = ", round(mean(means),2), "\n Theoretical Mean = 5" ), col="red")
+qplot(mns, geom = "histogram", bins = 40, fill = ..count.., ylab = "Frequency", main = "Actual vs Theoretical Mean")+geom_vline(xintercept = 5, color = "red")
 ```
 
-It looks like we're in pretty good shape.
+It looks like we're in pretty good shape.  In mathland, the sample mean we have is 
+
+```{r}
+round(mean(mns),2)
+```
+
+so we're right on track.
 
 ## Sample Variance Versus Theoretical Variance
 
 Since the standard deviation of the exponential distribution is (1/lambda)/sqrt(n) we see the following for the standard deviation:
 
 ```{r}
-print(paste("Theoretical: ", round((1/lambda)/sqrt(n),4), ", Sample", round(sd(means),4)))
+print(paste("Theoretical: ", round((1/lambda)/sqrt(n),4), ", Sample", round(sd(mns),4)))
 ```
 
 and for the variances we have
 
 ```{r}
-print(paste("Theoretical: ", (1/lambda)^2/n, ", Sample", round(var(means),4)))
+print(paste("Theoretical: ", (1/lambda)^2/n, ", Sample", round(var(mns),4)))
 ```
 
 Based on the coursework, this suggests we're on track with the theoretical values.
@@ -68,8 +78,8 @@ Based on the coursework, this suggests we're on track with the theoretical value
 Finally we were asked to explore whether or not the exponential distribution is close to normal. It certainly would seem as though it should be based on the Central Limit Theorem.
 
 ```{r}
-hist(means, prob=TRUE, col="blue", main="Mean Distribution for rexp()", breaks=20)
-lines(density(means), lwd=3, col="red")
+hist(mns, prob=TRUE, col="blue", main="Mean Distribution for rexp()", breaks=20)
+lines(density(mns), lwd=3, col="red")
 ```
 
 Based on this graph it certainly seems as though the theory matches up with our work.
