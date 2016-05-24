@@ -74,4 +74,48 @@ g <- ggplot(aes(x = supp, y = len), data = ToothGrowth) +
 g <- g + labs(title="Fig 4: Tooth Lenght (len) by Supplement(supp) & Dosage(dose)")
 print(g)
 ```
+Test 1. Check for group differences due to different supplement type assuming unequal variances between the two groups
+```{r welch1}
+# Two Sample Test lenght relative to supplement
+t.test(len ~ supp, paired = F, var.equal = F, data = ToothGrowth)
+```
 
+
+```{r welch2}
+dose1 <- subset(ToothGrowth, dose %in% c(0.5, 1.0))
+dose2 <- subset(ToothGrowth, dose %in% c(0.5, 2.0))
+dose3 <- subset(ToothGrowth, dose %in% c(1.0, 2.0))
+t.test(len ~ dose, paired = F, var.equal = F, data = dose1)
+```
+
+
+```{r}
+t.test(len ~ dose, paired = F, var.equal = F, data = dose2)
+```
+
+```{r}
+t.test(len ~ dose, paired = F, var.equal = F, data = dose3)
+```
+
+```{r}
+Tooth.dose4 <- subset(ToothGrowth, dose == 0.5)
+Tooth.dose5 <- subset(ToothGrowth, dose == 1.0)
+Tooth.dose6 <- subset(ToothGrowth, dose == 2.0)
+t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose4)
+```
+
+```{r}
+t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose5)
+```
+
+```{r}
+t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose6)
+```
+
+The confidence intervals for dose levels 0.5mg and 1.0mg([1.72, 8,78] within 0.5mg, [2.80, 9.06] within 1.0mg) allow for the rejection of the null hypothesis and a confirmation that there is a significant correlation between tooth length and dose levels. However, the confidence interval for dose level 2.0[-3.80, 3.64] is not enough to reject the null hypothesis.
+
+5. Conclusions and Assumptions
+
+To make conclusions with the data in this dataset, we must assume that the poplulations are independent, that the variances between populations are different, a random population was used, the population was comprised of similar guinea pigs, measurement error was accounted for with significant digits, and double blind research methods were used. For the populations to be independent, 60 guinea pigs would have to be used so each combination of dose level and delivery method were not affected by the other methods. To ensure double blind research methods are followed, the researchers taking the measurements must have been unaware of which guinea pigs were given which dose level or delivery method. The guinea pigs must also be unaware that they are being given a specific treatment.
+
+If all the preceding assumptions are true, we may infer that there is a significant difference between tooth length and dose levels across both delivery methods. A higher dose level consistently led to longer teeth. Initially it appeared that the delivery method had no significant impact on tooth length, but when controlling for dose level we discovered that there was a significant difference at 0.5mg and 1.0mg, but not at 2.0mg. Based on this evidence, it appears that orange juice is a better delivery method with a larger impact on tooth length for a given dose of Vitamin C, but above a maximum dose level there is no further improvement.
