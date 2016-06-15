@@ -1,8 +1,8 @@
 ---
 title: "Tooth Growth Analysis"
 author: "James Sheldon"
-date: "May 23, 2016"
-output: html_document
+date: "May 24, 2016"
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -17,7 +17,7 @@ sessionInfo()
 
 ## Overview
 
-This analysis pertains to the ToothGrowth dataset made available in the R platform.  We will load the data, summarize what we are seeing, perform some exploratory analysis and use confidence intervals and hypothesis tests to determine any relationships between tooth growth and the other variables.
+This analysis pertains to the ToothGrowth dataset made available in the R platform.  We will load and summarize the data, perform some exploratory analysis and use confidence intervals and hypothesis tests to determine any relationships between tooth growth and the other variables.
 
 ```{r teeth}
 data("ToothGrowth")
@@ -38,46 +38,36 @@ What we're seeing is this data represents the delivery of three different levels
 
 ## Exploratory Analysis
 
-You can also embed plots, for example:
+Let's now explore the data a bit.  We'll take a look at a number of boxplots.  This should hopefully help us at least get an idea on whether or not there are correlations between different data elements.  Of course, it's important to remember that *correlation does not imply causation.* We are merely looking for some correlations and will explore those correlations further once they're noted.
 
-```{r tooth supp and dose, echo=FALSE}
-# Calculate len mean for every dose and supp
+
+
+```{r tooth supp and dose, echo=TRUE}
 avg <- aggregate(len~.,data=ToothGrowth,mean)
-#Plot the Tooth Lenght (len) relative to Dosage(dose) & Supplement (supp)
-g <- ggplot(data = ToothGrowth,aes(x=dose,y=len))
-g <- g + geom_point(aes(group=supp,colour=supp,size=2,alpha=0.6))
-g <- g + geom_line(data=avg,aes(group=supp,colour=supp))
-g <- g + labs(title="Fig 1: Tooth Lenght (len) relative to Dosage(dose) & Supplement (supp)")
-print(g)
+#Plot the Tooth Length relative to Dosage & Supplement
+ggplot(data = ToothGrowth,aes(x=dose,y=len)) + geom_point(aes(group=supp,colour=supp,size=2,alpha=0.6)) + geom_line(data=avg,aes(group=supp,colour=supp)) + labs(title="Tooth Length vs Dosage & Supplement")
 ```
 
 ```{r tooth and supp}
-# Analyze the Tooth Lenght (len) relationship to Supplement(supp) independent of dose
-g <- ggplot(aes(x = supp, y = len), data = ToothGrowth) + 
-    geom_boxplot(aes(fill = supp))
-g <- g + labs(title="Fig 2: Tooth Lenght (len) relationship to Supplement(supp)")
-print(g)
+ggplot(aes(x = supp, y = len), data = ToothGrowth) + geom_boxplot(aes(fill = supp)) + labs(title="Tooth Length sv Supplement")
 ```
 
 ```{r tooth and dose}
-# Analyze the Tooth Lenght (len) relationship to Dose (does) independent of Supplement
-g <- ggplot(aes(x = factor(dose), y = len), data = ToothGrowth) + 
-    geom_boxplot(aes(fill = factor(dose)))
-g <- g + labs(title="Fig 3: Tooth Lenght (len) relationship to Dosage(dose)")
-print(g)
+ggplot(aes(x = factor(dose), y = len), data = ToothGrowth) + geom_boxplot(aes(fill = factor(dose))) + labs(title="Tooth length vs Dosage")
 ```
 
 ```{r}
-# Determine if within a Dosage - supplements have different effects on tooth growth
-g <- ggplot(aes(x = supp, y = len), data = ToothGrowth) +
-    geom_boxplot(aes(fill = supp)) + facet_wrap(~ dose)
-g <- g + labs(title="Fig 4: Tooth Lenght (len) by Supplement(supp) & Dosage(dose)")
-print(g)
+ggplot(aes(x = supp, y = len), data = ToothGrowth) + geom_boxplot(aes(fill = supp)) + facet_wrap(~ dose) + labs(title="Tooth Length vs Supplement & Dosage")
 ```
-Test 1. Check for group differences due to different supplement type assuming unequal variances between the two groups
+
+The above plots illustrate there is a strong positive correlation between dosage and tooth length.  on the surface, the vector being employed doesn't show as strong of a correlation; however, it is too early to rule that out.
+
+## Confidence Testing
+
+Now let's apply some t-tests to determine confidence intervals for any correlations we may be seeing in the data.
+
 ```{r welch1}
-# Two Sample Test lenght relative to supplement
-t.test(len ~ supp, paired = F, var.equal = F, data = ToothGrowth)
+t.test(len ~ supp, paired = FALSE, var.equal = FALSE, data = ToothGrowth)
 ```
 
 
@@ -85,37 +75,33 @@ t.test(len ~ supp, paired = F, var.equal = F, data = ToothGrowth)
 dose1 <- subset(ToothGrowth, dose %in% c(0.5, 1.0))
 dose2 <- subset(ToothGrowth, dose %in% c(0.5, 2.0))
 dose3 <- subset(ToothGrowth, dose %in% c(1.0, 2.0))
-t.test(len ~ dose, paired = F, var.equal = F, data = dose1)
+t.test(len ~ dose, paired = FALSE, var.equal = FALSE, data = dose1)
 ```
 
 
 ```{r}
-t.test(len ~ dose, paired = F, var.equal = F, data = dose2)
+t.test(len ~ dose, paired = FALSE, var.equal = FALSE, data = dose2)
 ```
 
 ```{r}
-t.test(len ~ dose, paired = F, var.equal = F, data = dose3)
+t.test(len ~ dose, paired = FALSE, var.equal = FALSE, data = dose3)
 ```
 
 ```{r}
 Tooth.dose4 <- subset(ToothGrowth, dose == 0.5)
 Tooth.dose5 <- subset(ToothGrowth, dose == 1.0)
 Tooth.dose6 <- subset(ToothGrowth, dose == 2.0)
-t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose4)
+t.test(len ~ supp, paired = FALSE, var.equal = FALSE, data = Tooth.dose4)
 ```
 
 ```{r}
-t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose5)
+t.test(len ~ supp, paired = FALSE, var.equal = FALSE, data = Tooth.dose5)
 ```
 
 ```{r}
-t.test(len ~ supp, paired = F, var.equal = F, data = Tooth.dose6)
+t.test(len ~ supp, paired = FALSE, var.equal = FALSE, data = Tooth.dose6)
 ```
 
-The confidence intervals for dose levels 0.5mg and 1.0mg([1.72, 8,78] within 0.5mg, [2.80, 9.06] within 1.0mg) allow for the rejection of the null hypothesis and a confirmation that there is a significant correlation between tooth length and dose levels. However, the confidence interval for dose level 2.0[-3.80, 3.64] is not enough to reject the null hypothesis.
+## Conclusions
 
-5. Conclusions and Assumptions
-
-To make conclusions with the data in this dataset, we must assume that the poplulations are independent, that the variances between populations are different, a random population was used, the population was comprised of similar guinea pigs, measurement error was accounted for with significant digits, and double blind research methods were used. For the populations to be independent, 60 guinea pigs would have to be used so each combination of dose level and delivery method were not affected by the other methods. To ensure double blind research methods are followed, the researchers taking the measurements must have been unaware of which guinea pigs were given which dose level or delivery method. The guinea pigs must also be unaware that they are being given a specific treatment.
-
-If all the preceding assumptions are true, we may infer that there is a significant difference between tooth length and dose levels across both delivery methods. A higher dose level consistently led to longer teeth. Initially it appeared that the delivery method had no significant impact on tooth length, but when controlling for dose level we discovered that there was a significant difference at 0.5mg and 1.0mg, but not at 2.0mg. Based on this evidence, it appears that orange juice is a better delivery method with a larger impact on tooth length for a given dose of Vitamin C, but above a maximum dose level there is no further improvement.
+From the above confidence interval results we can conclude that there is a significant correlation between tooth length and dose levels.
