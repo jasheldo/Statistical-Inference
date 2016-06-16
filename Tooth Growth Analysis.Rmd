@@ -2,7 +2,7 @@
 title: "Tooth Growth Analysis"
 author: "James Sheldon"
 date: "May 23, 2016"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -22,12 +22,6 @@ This analysis pertains to the ToothGrowth dataset made available in the R platfo
 ```{r teeth}
 data("ToothGrowth")
 summary(ToothGrowth)
-str(ToothGrowth)
-head(ToothGrowth)
-tail(ToothGrowth)
-unique(ToothGrowth$dose)
-unique(ToothGrowth$supp)
-by(ToothGrowth$len, INDICES = list(ToothGrowth$supp, ToothGrowth$dose), summary)
 ```
 
 What we're seeing is this data represents the delivery of three different levels of Vitamin C (0.5, 1, and 2 mg) via two different vectors:  orange juice or ascorbic acid.  There are 60 total observations with three variables:
